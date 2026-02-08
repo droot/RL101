@@ -1,0 +1,31 @@
+sequenceDiagram
+    participant O as RL Training Loop
+    participant I as Inference Infra (Active Model)
+    participant G as Generator
+    participant D as Dataset
+    participant T as Training Infra (Model Updater)
+
+    Note over I,T: Physical separation of Inference and Training hardware
+    
+    loop For K Iterations
+        O->>G: 1. Request Batch of N episodes
+        
+        rect rgb(240, 248, 255)
+            Note over G,I: Generation Phase (on Inference Infra)
+            loop N times
+                G->>D: 2. Fetch Prompt
+                D-->>G: Prompt
+                G->>I: 3. Run Agentic Loop (Generation)
+                I-->>G: Completed Trajectory + Reward
+            end
+        end
+        
+        G-->>O: 4. Return Batch of N rows
+        
+        O->>T: 5. Submit Batch and Model M_i for training
+        Note over T: Trainer computes Loss, runs Backprop,<br/>and updates model weights
+        T-->>O: 6. Return Updated Model M_{i+1}
+        
+        Note over O,I: === WEIGHT SYNC ===
+        O->>I: 7. Sync M_{i+1} weights to Inference Infra
+    end
