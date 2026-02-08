@@ -1,0 +1,30 @@
+sequenceDiagram
+    participant O as RL Training Loop
+    participant M as Model (M_i)
+    participant G as Generator
+    participant D as Dataset
+    participant T as Trainer
+
+    Note over M: Starts as Base Model M1
+    
+    loop For K Iterations
+        O->>G: 1. Request Batch of N episodes
+        
+        rect rgb(240, 248, 255)
+            Note over G,M: Generation Phase
+            loop N times
+                G->>D: 2. Fetch Prompt
+                D-->>G: Prompt
+                G->>M: 3. Run Agentic Loop (Generation)
+                M-->>G: Completed Trajectory + Reward
+            end
+        end
+        
+        G-->>O: 4. Return Batch of N rows
+        
+        O->>T: 5. Submit Batch and Model M_i for training
+        Note over T: Trainer computes Loss, runs Backprop,<br/>and updates model weights
+        T-->>O: 6. Return Updated Model M_{i+1}
+        
+        O->>M: 7. Load M_{i+1} as the new active model
+    end
