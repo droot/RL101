@@ -2,6 +2,7 @@ sequenceDiagram
     participant O as RL Training Loop
     participant M as Model (M_i)
     participant G as Generator
+    participant E as Environment & Grader
     participant D as Dataset
     participant T as Trainer
 
@@ -11,12 +12,15 @@ sequenceDiagram
         O->>G: 1. Request Batch of N episodes
         
         rect rgb(240, 248, 255)
-            Note over G,M: Generation Phase
+            Note over G,E: Generation Phase
             loop N times
                 G->>D: 2. Fetch Prompt
                 D-->>G: Prompt
-                G->>M: 3. Run Agentic Loop (Generation)
-                M-->>G: Completed Trajectory + Reward
+                G->>M: 3a. Sample Actions (Inference)
+                M-->>G: Tool Call Intention
+                G->>E: 3b. Execute Tools & Grade
+                E-->>G: Observation & Reward
+                Note over G: Trajectory Completed
             end
         end
         
