@@ -25,7 +25,12 @@ sequenceDiagram
     
     A->>G: 3. Submit completed trajectory
     
-    Note over G: Evaluate based on compilation,<br/>tests, or Reward Model
-    G-->>A: 4. Return Reward (Positive/Negative)
+    rect rgb(240, 255, 240)
+        Note over G,E: Grading Phase
+        G->>E: 4a. Run tests / compile code in sandbox
+        E-->>G: 4b. Test results (e.g., Pass/Fail)
+    end
     
-    A->>B: 5. Store (Prompt, Trajectory, Reward)
+    G-->>A: 5. Return Reward (Positive/Negative)
+    
+    A->>B: 6. Store (Prompt, Trajectory, Reward)
